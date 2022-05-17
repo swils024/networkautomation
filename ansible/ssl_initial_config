@@ -1,0 +1,12 @@
+conf t
+username david privilege 15 password cisco
+ip ssh pubkey-chain
+username david
+key-string
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCYwF8RoApGb7IXzZgIwx03r0QX8DqE7vpoHqm4i77qVySjiEzqS/o88Z6dXZ7BI4qzD5977dzbwHxUVJqQwg3vQc4Hw25HLDUFKgDsQnbS7SFjqF76VdBPmS6CK/KpXxwZ0C+yu9Z2i8CeIqBuRoA+5RIgAYHNrqIwuhol6uajSJCQZ7A4Gw1AIv482Zr7ESSaSr+/UIpQbYyz/sitypRnd
+lqHnn5WzOTuntv+ifYRqomQ5nXxlki1eijNuMsKuQs3uAPvsNV0BDHXlaB2zpohuEMGZJlXPTlLYRtFZFga/fdZ1Y4l8Rlkw7A2aFcgnFQM1PTNEeY4hzTuuRMbrujF root@NetworkAutomation-1
+exit 
+ip ssh version 2
+exit
+term length 0
+show clock

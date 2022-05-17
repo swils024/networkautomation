@@ -1,0 +1,11 @@
+project folder/
+ - playbook.yml
+ - roles/
+   - common/
+   - files/
+   - templates/
+   - tasks/
+   - handlers/
+   - vars/
+   - defaults/
+   - meta/

@@ -1,0 +1,22 @@
+---
+- name: Backup show run and other priviledged level commands
+  hosts: S1, S2
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: run multiple commands on remote nodes
+      ios_command:
+        authorize: yes
+        commands:
+          provider: "{{ cli }}"
+          authorize: yes
+          parents: router eigrp 1
+          lines:
+            - network 0.0.0.0 255.255.255.255
+
+      register: print_output
+    - debug: var=print_output.stdout_lines
+
+    - name: Save output to a file
+      copy: content="{{ print_output.stdout[0] }}" dest="./output/{{ inventory_hostname }}_running.cfg"

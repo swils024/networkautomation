@@ -1,0 +1,45 @@
+---
+- name: Configure EIGRP
+  hosts: switches1to4
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: Task 1 - EIGRP 100
+      ios_command:
+        commands:
+          authorize: yes
+          parents: router eigrp 100
+          lines:
+            - network 0.0.0.0 255.255.255.255
+            - no auto-summary
+
+      register: print_output
+    - debug: var=print_output.stdout_lines
+#    
+# router eigrp 100
+# network 10.0.0.0
+# no auto-summary
+
+
+# Tests S1
+# sh ip route
+# sh standby
+# ping 10.1.100.1
+# ping 10.1.100.253
+
+
+# R3
+# loop 0
+# ip add 3.3.3.3 255.255.255.255
+
+# R1 
+# ping 3.3.3.3 (fails)
+
+# R3
+# router eigrp 100
+# network 3.3.3.3 0.0.0.0
+
+# Advertise default route to cloud
+# ip route 0.0.0.0 0.0.0.0 192.168.1.254
+# redistribute static metric 10000 100 255 1 1500

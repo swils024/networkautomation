@@ -1,0 +1,13 @@
+[gns3_ios]
+R4
+R5
+S5
+S6
+
+[switches]
+S5
+S6
+
+[routers]
+R4
+R5

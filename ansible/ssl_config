@@ -1,0 +1,167 @@
+enable
+conf t
+int vlan 1
+no shut
+username david pass cisco
+username david priv 15
+line vty 0 4
+login local
+transport input all
+ip domain-name cciepython.com
+crypto key generate rsa
+1024
+
+
+Client side
+
+I'm assuming client is a flavor of unix, just because it's the more common way. This method however works on Windows using Putty and other terminal emulators.
+
+Let's verify that we have a public key already:
+
+ 
+
+cd
+
+cat .ssh/id_rsa.pub
+
+ 
+
+If it's not there you can generate it by using interactive command:
+
+ssh-keygen 
+
+ 
+
+ 
+Server side
+
+Create a user:
+
+username test priv 15 secret supers3cr3tn0bdyw1llgue55
+
+ 
+
+You need to make sure this public key is trusted by our router.
+ip ssh pubkey-chain
+     username test
+          key-string
+               copy the entire public key as appears in the cat id_rsa.pub including the ssh-rsa and username@hostname.
+               please note that some IOS versions will accept maximum 254 characters.
+               you can paste multiple lines.     
+          exit
+     exit
+
+Please also make sure that you generate RSA keys on Server larger than 768 bits.
+
+You can also set SSHv2 on server side (although strictly speaking it's not required if you're using SSH 1.99)
+
+ip ssh version 2
+
+ 
+
+ 
+Verification
+
+Typically most devices prefer following order of authentication mechanism:
+
+1) Public key
+
+2) Keyboard interactive
+
+3) Password
+
+This allows us to try use pubic key auth without any additional changes.
+
+For example I could use this:
+
+Linux# ssh -2 -v test@bsns-asr1006-2.cisco.com
+
+ 
+Big output handling
+
+ 
+
+One that is done we can discuss handling of big outputs.
+
+ 
+
+There are two way of doing it.
+
+ 
+One command at a time
+
+ 
+
+SSH allows you to specify as a parameter the command to be executed.
+
+For example.
+
+ssh test@bsns-asr1002-1.cisco.com 'show clock'
+
+This command will log into IOS device, execute "show clock" command and disconnect immedietly.
+
+ 
+
+The downside is quite obvious, you would need to start multiple session to exacute several commands (unlike most UNIX flavors)
+
+ 
+Pipelining
+
+A need may arrise to execute several commands in one big batch.
+
+ 
+
+You should start by understanding which commands you would need to put in that batch.
+
+ 
+
+For example my batch:
+
+Linux# cat commands
+
+show clock
+
+term len 0
+
+term exec pro ti
+
+show ip nat trans
+
+show ip nat trans total
+
+show platf hard qfp act fea ipsec data drop
+
+show platf hard qfp act stati drop
+
+show tech
+
+ 
+
+I can pipe those commands into my SSH sessions and get desired outputs. Right?
+
+Yes and no :-)
+
+ 
+
+If you perform just:
+
+cat commands | ssh -T test@bsns-asr1002-1.cisco.com 
+
+You will notice  that not all outputs complete - depending on timing.
+
+ 
+What's the problem?
+
+The actual issue is related to handling of end of file (EOF), which is signalising to SSH to close the connection down.
+
+ 
+
+The solution is to delay that EOF until output finishes.
+
+ 
+
+A very simple way to accomplish this in bash is:
+
+( cat commands ; sleep 100 ) | ssh -T test@bsns-asr1002-1.cisco.com
+
+What this will do is allow 100 seconds to finish execution of that batch of commands - even on asr 1000 with medium sized config and ultization it should be enough to extract everything.

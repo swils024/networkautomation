@@ -1,7 +1,0 @@
-configure terminal
-hostname Router1
-interface Loopback10
-ip address 10.10.18.100 255.255.255.255
-exit
-snmp-server Netbrain snmp string
-snmp-server Management snmp string

@@ -1,0 +1,9 @@
+# Show WiFi SSIDs
+netsh wlan show profile
+
+# Show WiFi profile detail
+netsh wlan show profile <SSID>
+
+# Show WiFi profile details with cleartext password
+netsh wlan show profile <SSID> key=clear
+
